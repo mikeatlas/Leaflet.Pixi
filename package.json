@@ -6,7 +6,7 @@
 	"dependencies": {
 		"leaflet": "~0.7.1",
     	"twojs-browserify": "^0.2.0"
-  	}
+  	},
 	"devDependencies": {
 		"jshint": "~2.1.3",
 		"mocha": "~1.10.0",
