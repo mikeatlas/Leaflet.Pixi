@@ -1,6 +1,8 @@
 # Credit to https://raw.githubusercontent.com/github/gitignore/master/Node.gitignore
 # for this base gitignore node template.
 
+# exclude dist directory
+dist
 
 # Logs
 logs
