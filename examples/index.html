@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.css" rel="stylesheet">
+		<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet-src.js'></script>
+		
+	</head>
+
+	<body>
+		Hello.
+		<div id="map" style='height: 500px;'></div>
+	</body>
+
+
+		<script type='text/javascript'>
+			// Create the map
+			var map = L.map('map').setView([42.388349, -71.119355], 5);
+
+			// Set up the OSM layer
+			L.tileLayer(
+			    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+			    {maxZoom: 18}).addTo(map);
+
+			// add a marker in the given location
+			L.marker([42.388349, -71.119355]).addTo(map);
+		</script>
+
+</html>
