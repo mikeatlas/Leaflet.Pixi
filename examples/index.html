@@ -28,13 +28,18 @@
 			var twoHandle = scene.twoHandle();
 			var pos1 = map.latLngToContainerPoint(porterSq);
 
-			circle = twoHandle.makeCircle(pos1.x, pos1.y, 10);
-			circle.fill = '#fff800';
-			circle.stroke = 'red';
-			circle.linewidth = 5;
-			twoHandle.update();	
-			twoHandle.makeGroup(circle);
+			circle = twoHandle.makeCircle(pos1.x, pos1.y, 1);
+			circle.fill = '#7F007F';
+			circle.stroke = '#7F007F';
+			circle.linewidth = 2;
+			twoHandle.update();
+			var group = twoHandle.makeGroup(circle);
 			
+
+			map.on('move', function(event){
+				//console.dir(event.target);
+			});
+		
 		</script>
 
 </html>
