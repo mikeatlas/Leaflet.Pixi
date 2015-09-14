@@ -6,8 +6,6 @@
 	</head>
 
 	<body>
-		Hello.
-		<div id="scene"></div>
 		<div id="map" style='height: 500px;'></div>
 	</body>
 
@@ -16,16 +14,26 @@
 			// Create the map
 			var map = L.map('map').setView([42.388349, -71.119355], 3);
 
-			// Set up the OSM layer
+			//Set up the OSM base layer
 			L.tileLayer(
 			    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 			    {maxZoom: 18}).addTo(map);
+		
+			var scene = L.TileLayer.twoJsTileLayer({zIndex: 100})
+			scene.addTo(map);
 
-			var twoJsTileLayer = new L.TileLayer.TwoJsTileLayer();
-			//map.addLayer(heatmap); 
+			var porter = new L.LatLng(42.388349, -71.119355);
+			L.marker(porter).addTo(map);
 
-			// add a marker in the given location
-			L.marker([42.388349, -71.119355]).addTo(map);
+			var twoHandle = scene.twoHandle();
+			var pos = new L.LatLng(42.388349, -71.119355).asTwoJsPixelPos();		
+
+			circle = twoHandle.makeCircle(pos.x, pos.y, 20);
+			circle.fill = '#fff800';
+			circle.stroke = 'organered';
+			circle.linewidth = 5;
+			twoHandle.update();
+
 		</script>
 
 </html>

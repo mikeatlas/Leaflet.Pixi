@@ -1,32 +1,58 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
- L.TileLayer.TwoJsTileLayer = L.Class.extend({
+
+L.LatLng.prototype.asTwoJsPixelPos = function(options) {
+	var projecton;
+	if (options.projecton)
+		projecton = options.projecton;
+	else {
+		projecton = L.Projection.Mercator;
+	}
+	var point = projecton.project(this);
+	return point;
+};
+
+
+ L.TileLayer.TwoJsTileLayer = L.TileLayer.extend({
 
  	options: {
  		option1: 1,
  		option2: 2
  	},
 
+ 	onAdd: function (map) {
+		this.map = map;
+		this.initTwoJS()
+	},
+
  	initialize: function (options) {
- 		this.data = [];
- 		L.Util.setOptions(this, options);
- 		this.initTwoJS();
+ 		options = L.setOptions(this, options);
+ 		if (options.zIndex){
+ 			this.zIndex = options.zIndex;
+ 		}
  	},
 
  	initTwoJS: function() {
- 		var Two = require('twojs-browserify');
-		var elem = document.querySelector('#scene');
+ 		var Two, circle, elem, params, two;
 
-		var params = {
-		  width: 200,
-		  height: 100
-		};
+		Two = require('twojs-browserify');
+		var mapsize = this.map.getSize();
+		var options = this.options;
+		
+		var layerElem = document.createElement("twojsElementLayer");
+		layerElem.id = 'twojsElementLayer' + L.Util.stamp(this);
 
-		var two = new Two(params).appendTo(elem);
-		var circle = two.makeCircle(72, 70, 10);
-		circle.fill = '#fff800';
-		circle.stroke = 'organered';
-		circle.linewidth = 5;
-		two.update();
+        layerElem.width = mapsize.x;
+        layerElem.height = mapsize.y;
+        layerElem.style.opacity = options.opacity;
+        layerElem.style.position = 'absolute';
+		
+		this.map.getPanes().overlayPane.appendChild(layerElem);
+
+		this.two = new Two(params).appendTo(layerElem);		
+ 	},
+
+ 	twoHandle: function () {
+ 		return this.two;
  	},
 
 });
