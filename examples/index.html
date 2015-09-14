@@ -12,7 +12,8 @@
 
 		<script type='text/javascript'>
 			// Create the map
-			var map = L.map('map').setView([42.388349, -71.119355], 3);
+			var porterSq = new L.LatLng(42.388349, -71.119355);
+			var map = L.map('map').setView(porterSq, 3);
 
 			//Set up the OSM base layer
 			L.tileLayer(
@@ -21,19 +22,19 @@
 		
 			var scene = L.TileLayer.twoJsTileLayer({zIndex: 100})
 			scene.addTo(map);
-
-			var porter = new L.LatLng(42.388349, -71.119355);
-			L.marker(porter).addTo(map);
+			
+			L.marker(porterSq).addTo(map);
 
 			var twoHandle = scene.twoHandle();
-			var pos = new L.LatLng(42.388349, -71.119355).asTwoJsPixelPos();		
+			var pos1 = map.latLngToContainerPoint(porterSq);
 
-			circle = twoHandle.makeCircle(pos.x, pos.y, 20);
+			circle = twoHandle.makeCircle(pos1.x, pos1.y, 10);
 			circle.fill = '#fff800';
-			circle.stroke = 'organered';
+			circle.stroke = 'red';
 			circle.linewidth = 5;
-			twoHandle.update();
-
+			twoHandle.update();	
+			twoHandle.makeGroup(circle);
+			
 		</script>
 
 </html>

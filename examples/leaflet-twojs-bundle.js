@@ -1,22 +1,12 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-
-L.LatLng.prototype.asTwoJsPixelPos = function(options) {
-	var projecton;
-	if (options.projecton)
-		projecton = options.projecton;
-	else {
-		projecton = L.Projection.Mercator;
-	}
-	var point = projecton.project(this);
-	return point;
-};
-
-
- L.TileLayer.TwoJsTileLayer = L.TileLayer.extend({
+L.TileLayer.TwoJsTileLayer = L.TileLayer.extend({
 
  	options: {
- 		option1: 1,
- 		option2: 2
+ 		size: 30000, // in meters
+ 	},
+
+ 	initialize: function (options) {
+ 		options = L.setOptions(this, options); 		 		
  	},
 
  	onAdd: function (map) {
@@ -24,15 +14,9 @@ L.LatLng.prototype.asTwoJsPixelPos = function(options) {
 		this.initTwoJS()
 	},
 
- 	initialize: function (options) {
- 		options = L.setOptions(this, options);
- 		if (options.zIndex){
- 			this.zIndex = options.zIndex;
- 		}
- 	},
-
  	initTwoJS: function() {
  		var Two, circle, elem, params, two;
+ 		var params = {};
 
 		Two = require('twojs-browserify');
 		var mapsize = this.map.getSize();
@@ -48,12 +32,17 @@ L.LatLng.prototype.asTwoJsPixelPos = function(options) {
 		
 		this.map.getPanes().overlayPane.appendChild(layerElem);
 
-		this.two = new Two(params).appendTo(layerElem);		
+		params.type=Two.Types.canvas;
+
+		this.two = new Two(params).appendTo(layerElem);	
+
  	},
 
  	twoHandle: function () {
  		return this.two;
  	},
+
+
 
 });
 
