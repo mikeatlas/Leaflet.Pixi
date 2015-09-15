@@ -2,7 +2,7 @@
 	<head>
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.css" rel="stylesheet">
 		<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet-src.js'></script>
-		<script type="text/javascript" src='/leaflet-twojs-bundle.js'></script>
+		<script type="text/javascript" src='/leaflet-pixi-bundle.js'></script>
 	</head>
 
 	<body>
@@ -13,31 +13,23 @@
 		<script type='text/javascript'>
 			// Create the map
 			var porterSq = new L.LatLng(42.388349, -71.119355);
-			var map = L.map('map').setView(porterSq, 3);
+			var map = L.map('map').setView(porterSq, 10);
 
 			//Set up the OSM base layer
 			L.tileLayer(
 			    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 			    {maxZoom: 18}).addTo(map);
 		
-			var scene = L.TileLayer.twoJsTileLayer({zIndex: 100})
-			scene.addTo(map);
+			var pixiScene = L.TileLayer.pixiTileLayer().addTo(map);
 			
 			L.marker(porterSq).addTo(map);
 
-			var twoHandle = scene.twoHandle();
 			var pos1 = map.latLngToContainerPoint(porterSq);
-
-			circle = twoHandle.makeCircle(pos1.x, pos1.y, 1);
-			circle.fill = '#7F007F';
-			circle.stroke = '#7F007F';
-			circle.linewidth = 2;
-			twoHandle.update();
-			var group = twoHandle.makeGroup(circle);
 			
+			pixiScene.runTest();
 
 			map.on('move', function(event){
-				//console.dir(event.target);
+			
 			});
 		
 		</script>

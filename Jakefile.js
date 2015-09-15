@@ -1,5 +1,5 @@
 /*
-Leaflet.TwoJS building, testing and linting scripts.
+Leaflet.Pixi building, testing and linting scripts.
 
 To use, install Node, then run the following commands in the project root:
 
@@ -14,10 +14,10 @@ For a custom build, open build/build.html in the browser and follow the instruct
 
 var build = require('./build/build.js');
 
-desc('Check Leaflet.TwoJS source for errors with JSHint');
+desc('Check Leaflet.Pixi source for errors with JSHint');
 task('lint', build.lint);
 
-desc('Combine and compress Leaflet.TwoJS source files');
+desc('Combine and compress Leaflet.Pixi source files');
 task('build', ['lint'], build.build);
 
 desc('Run PhantomJS tests');

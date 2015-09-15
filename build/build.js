@@ -120,7 +120,7 @@ exports.build = function (compsBase32, buildName) {
 	    outro = '}(window, document));',
 	    newSrc = intro + combineFiles(files) + outro,
 
-	    pathPart = 'dist/leaflet.twojs' + (buildName ? '-' + buildName : ''),
+	    pathPart = 'dist/leaflet.pixi' + (buildName ? '-' + buildName : ''),
 	    srcPath = pathPart + '-src.js',
 
 	    oldSrc = loadSilently(srcPath),

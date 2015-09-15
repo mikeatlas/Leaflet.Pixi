@@ -1,4 +1,4 @@
-Allows a Leaflet TileLayer to delegate and interacte with a two.js scene. 
+Allows a Leaflet TileLayer to delegate and interacte with a pixi.js scene.
 
 There is a [demo](http://todo] available, which shows x/y/z
 
@@ -14,7 +14,7 @@ The plugin extends the core `L.TileLayer` class.
 
 
 ```
-var twoJsTileLayer = new L.TileLayer.TwoJsTileLayer({option: 1, option 2}); 
+var pixiTileLayer = L.TileLayer.pixiTileLayer({option: 1, option 2}); 
 ```
 
 Options available are as follows:
@@ -28,4 +28,4 @@ Additional `L.TileLayer` events available are as follows:
 
 # Credits / Inspiration
 
-* [Displaying WebGL data on Google Maps](http://build-failed.blogspot.cz/2013/02/displaying-webgl-data-on-google-maps.html)
+* [Displaying WebGL on Bing Maps (using Pixi.js)](http://build-failed.blogspot.com/2015/01/displaying-webgl-on-bing-maps-using.html)
