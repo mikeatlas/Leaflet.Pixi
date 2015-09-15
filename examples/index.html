@@ -13,7 +13,7 @@
 		<script type='text/javascript'>
 			// Create the map
 			var porterSq = new L.LatLng(42.388349, -71.119355);
-			var map = L.map('map').setView(porterSq, 10);
+			var map = L.map('map').setView(porterSq, 5);
 
 			//Set up the OSM base layer
 			L.tileLayer(
@@ -23,15 +23,9 @@
 			var pixiScene = L.TileLayer.pixiTileLayer().addTo(map);
 			
 			L.marker(porterSq).addTo(map);
-
-			var pos1 = map.latLngToContainerPoint(porterSq);
 			
 			pixiScene.runTest();
-
-			map.on('move', function(event){
 			
-			});
-		
 		</script>
 
 </html>
