@@ -42,6 +42,8 @@ L.Pixi = L.Renderer.extend({
 			.on(container, 'mouseout', this._handleMouseOut, this);
 
 		this._ctx = stage;
+		
+		L.Renderer.prototype._update.call(this);
 	},
 
 	_update: function () {
