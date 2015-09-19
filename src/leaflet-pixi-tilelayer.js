@@ -1,13 +1,19 @@
-PIXI = require('pixi.js');
-	
+
 L.TileLayer.PixiTileLayer = L.TileLayer.extend({
- 	options: {
- 		option1: 1,
+ 	options: { 		
  		option2: 2,
  	},
 
+ 	// matlas todo: figure out how to override DOM class thing in base Renderer
+	// https://github.com/Leaflet/Leaflet/blob/bf8f0b45b1e734fcf317505511b8bc2fc0229c50/src/layer/vector/Renderer.js#L24
+	// pixi stuff can certainly be "zoom animated" but not in the traditional
+	// Leaflet 1.0 DOM CSS transition sense.
+	_zoomAnimated: false,
+
+
  	initialize: function (options) {
  		options = L.setOptions(this, options); 		 		
+ 		options.renderer = L.Pixi;
  	},
 
  	onAdd: function (map) {
