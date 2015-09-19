@@ -12,16 +12,15 @@ L.TileLayer.PixiTileLayer = L.TileLayer.extend({
 
  	onAdd: function (map) {
 		this.map = map;
-		this.map.on('viewreset', this.update, this);
 		this.initPixiTileLayer();
 		this.initMapEventHandlers();
 	},
 
  	initPixiTileLayer: function() {
  		var params = {};
- 		var tilePaneDiv = this.map.getPanes().tilePane;
- 		var overlayPaneDiv = this.map.getPanes().overlayPane;
- 		var stage = new PIXI.Container();
+ 		var tilePaneDiv = this.map.getPanes().tilePane
+ 		var overlayPaneDiv = this.map.getPanes().overlayPane
+		var stage = new PIXI.Container();
 		this.stage = stage;
 		var mapContainerDiv = this.map.getContainer();
 		var renderer = PIXI.autoDetectRenderer(
@@ -41,12 +40,6 @@ L.TileLayer.PixiTileLayer = L.TileLayer.extend({
 	},
 
 	_mapMoved: function(moveEvent){
-		//
-		// if (this._icon) {
-		// 	this._setPos(this._map.latLngToLayerPoint(this._latlng).round());
-		// }
-		// return this;
-
 		var pixelCenter = this.map.latLngToContainerPoint(moveEvent.target.getCenter());
 
 		var divTopLeft = this.map.getPixelOrigin();
@@ -54,7 +47,9 @@ L.TileLayer.PixiTileLayer = L.TileLayer.extend({
         var x = divTopLeft.x;
         var y = divTopLeft.y;
 
-        renderer.render(stage);
+        this.graphics.position.x = x;
+        this.graphics.position.y = y;
+        this.renderer.render(this.stage);
 	},
 
 	runTest: function(){
