@@ -1,4 +1,4 @@
-Allows a Leaflet TileLayer to delegate and interacte with a pixi.js scene.
+Allows a Leaflet map to render Pixi.js (2D WebGL) analogous abstracts paths in Leaflet such as circles/polygons/polylines.
 
 There is a [demo](http://todo] available, which shows x/y/z
 
@@ -10,18 +10,18 @@ Attempting to be compatible with either or both Leaflet 0.7 or 1.0-beta. TBD.
 
 # Usage
 
-The plugin extends the core `L.TileLayer` class.
+The plugin extends the core `L.Renderer` class and many of the following familar features are possible, for example:
 
 
 ```
-var pixiTileLayer = L.TileLayer.pixiTileLayer({option: 1, option 2}); 
+L.pixiCircleMarker(porterSq).addTo(map);
 ```
 
 Options available are as follows:
 
 * `option1`: set to true in order to enable the cache. This option must be set at initialization time.
 
-Additional `L.TileLayer` events available are as follows:
+Additional events available are as follows:
 
 * `event1`
 * `event2`
