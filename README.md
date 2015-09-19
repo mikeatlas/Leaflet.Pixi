@@ -6,7 +6,10 @@ Current state of the project: Incomplete! All work in the develop branch until s
 
 # Dependencies
 
-Attempting to be compatible with either or both Leaflet 0.7 or 1.0-beta. TBD.
+Attempting to be compatible with Leaflet 1.0+.
+
+While Leaflet 0.7 supported SVG and Canvas for a long time, and works on mobile and many low-power mobile or older browsers, the decision to only attempt to integrate with Leaflet 1.0 is because [WebGL](http://caniuse.com/#feat=webgl) really won't be considered widespread for long time, and those wishing to do advanced WebGL rendering with this plugin are likely going to be targeting the latest Leaflet 1.0+ builds anyways.
+
 
 # Usage
 
