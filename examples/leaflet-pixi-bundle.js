@@ -7,23 +7,13 @@ L.PixiCircleMarker = L.Path.extend({
 
 	options: {
 		fill: true,
+		fillOpacity: 1,
 		radius: 10,
 		renderer: new L.pixi(),
-
 	},
 
-	initialize: function (latlng, options) {
-		var opts = {} || options;
-		if (options) {
-			L.mergeOptions(options)
-		}
-		else {
-			opts = this.options;
-		}
-		this.options = opts;
-		
-		L.setOptions(this, this.options);
-		
+	initialize: function (latlng, options) {		
+		L.setOptions(this, options);		
 		this._latlng = L.latLng(latlng);
 		this._radius = this.options.radius;
 	},
@@ -95,8 +85,11 @@ L.Pixi = L.Renderer.extend({
 
 	_rendererName: 'Leaflet.PixiJS.Renderer',
 	_rendererInfo: 'Pixi.JS Version: ' + PIXI.VERSION,
+	_container: null,
+	_renderer: null,
+	_graphics: new PIXI.Graphics(),
 
-	
+
 	onAdd: function () {
 		if (!this._container) {
 			this._initContainer(); // defined by renderer implementations
@@ -108,56 +101,51 @@ L.Pixi = L.Renderer.extend({
 		this._draw();		
 	},
 
+	_animateZoom: function() {},
+
 	_initContainer: function () {
-		var overlayPaneDiv = this._map.getPanes().overlayPane;
- 		var stage = new PIXI.Container();
-		this.stage = stage;
-		var container = this._map.getContainer();
+		var overlayDiv = this._map.getPanes().overlayPane;
+		
+		this._container = new PIXI.Container();
+		this._ctx = this._container;
+		
 		var renderer = PIXI.autoDetectRenderer(
-			container.offsetWidth, 
-			container.offsetHeight, 
+			overlayDiv.offsetWidth, 
+			overlayDiv.offsetHeight, 
 			{transparent: true}
 		);
-		this.renderer = renderer;
-		overlayPaneDiv.parentNode.lastChild.appendChild(renderer.view);
+		this._renderer = renderer;
+
+		overlayDiv.appendChild(renderer.view);
 		renderer.view.style.position = "absolute";
 		renderer.view.style.top = "0px";
-		renderer.render(stage);
-		
-		L.DomEvent
-			.on(container, 'mousemove', L.Util.throttle(this._onMouseMove, 32, this), this)
-			.on(container, 'click dblclick mousedown mouseup contextmenu', this._onClick, this)
-			.on(container, 'mouseout', this._handleMouseOut, this);
-
-		this._ctx = stage;
+		renderer.render(this._container);
+	
+		L.Renderer.prototype._update.call(this);
 	},
 
 	_update: function () {
-		if (this._map._animatingZoom && this._bounds) { return; }
-
+		if (this._map._animatingZoom && this._bounds) { 
+			return; 
+		}		
 		this._drawnLayers = {};
 
 		L.Renderer.prototype._update.call(this);
 
 		var b = this._bounds,
-		    container = this._container,
 		    size = b.getSize(),
 		    m = L.Browser.retina ? 2 : 1;
 
-		L.DomUtil.setPosition(container, b.min);
+		//set webgl renderer size (2x factor for retina)
+		this._renderer.resize(m * size.x, m * size.y)
 
-		// set canvas size (also clearing it); use double size on retina
-		container.width = m * size.x;
-		container.height = m * size.y;
-		container.style.width = size.x + 'px';
-		container.style.height = size.y + 'px';
-
-		if (L.Browser.retina) {
-			this._ctx.scale(2, 2);
-		}
+		// if (L.Browser.retina) {
+		// 	this._container.scale = new PIXI.Point(2, 2);
+		// }
 
 		// translate so we use the same path coordinates after canvas element moves
-		this._ctx.translate(-b.min.x, -b.min.y);
+		console.log("fix ctx.translate!")
+		//this._ctx.translate(-b.min.x, -b.min.y);
 	},
 
 	_initPath: function (layer) {
@@ -246,28 +234,25 @@ L.Pixi = L.Renderer.extend({
 		// TODO optimization: 1 fill/stroke for all features with equal style instead of 1 for each feature
 	},
 
+	_updateTransform: function () {
+		var zoom = this._map.getZoom(),
+		    center = this._map.getCenter(),
+		    scale = this._map.getZoomScale(zoom, this._zoom),
+		    offset = this._map._latLngToNewLayerPoint(this._topLeft, zoom, center);
+
+		console.log('fix _updateTransform')
+		//	L.DomUtil.setTransform(this._container, offset, scale);
+	},
+
 	_updateCircle: function (layer) {
-
-		if (layer._empty()) { return; }
-
-		var p = layer._point,
-		    ctx = this._ctx,
-		    r = layer._radius,
-		    s = (layer._radiusY || r) / r;
-
-		if (s !== 1) {
-			ctx.save();
-			ctx.scale(1, s);
-		}
-
-		ctx.beginPath();
-		ctx.arc(p.x, p.y / s, r, 0, Math.PI * 2, false);
-
-		if (s !== 1) {
-			ctx.restore();
-		}
-
-		this._fillStroke(ctx, layer);
+		var color = layer.options.color.toNumber();
+		var alpha = layer.options.fillOpacity;
+		this._graphics.beginFill(color, alpha);
+		var p = this._map.latLngToLayerPoint(layer.getLatLng())
+		this._graphics.drawCircle(p.x, p.y, layer._radius);
+		this._graphics.endFill();		
+		this._container.addChild(this._graphics);
+		this._renderer.render(this._container);
 	},
 
 	_fillStroke: function (ctx, layer) {
@@ -532,7 +517,21 @@ L.TileLayer.pixiTileLayer = function (options) {
 	return new L.TileLayer.PixiTileLayer(options);
 };
 },{}],4:[function(require,module,exports){
+require('./utils.js');
 require('./leaflet-pixi-renderer.js');
 require('./leaflet-pixi-tilelayer.js');
 require('./leaflet-pixi-circlemarker.js');
-},{"./leaflet-pixi-circlemarker.js":1,"./leaflet-pixi-renderer.js":2,"./leaflet-pixi-tilelayer.js":3}]},{},[4]);
+},{"./leaflet-pixi-circlemarker.js":1,"./leaflet-pixi-renderer.js":2,"./leaflet-pixi-tilelayer.js":3,"./utils.js":5}],5:[function(require,module,exports){
+
+if (typeof String.prototype.endsWith !== 'function') {
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+}
+
+if (typeof String.prototype.toNumber !== 'function') {
+    String.prototype.toNumber = function() {
+        return parseInt(this.replace(/^#/, ''), 16)
+    };
+}
+},{}]},{},[4]);

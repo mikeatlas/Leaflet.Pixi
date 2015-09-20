@@ -6,23 +6,13 @@ L.PixiCircleMarker = L.Path.extend({
 
 	options: {
 		fill: true,
+		fillOpacity: 1,
 		radius: 10,
 		renderer: new L.pixi(),
-
 	},
 
-	initialize: function (latlng, options) {
-		var opts = {} || options;
-		if (options) {
-			L.mergeOptions(options)
-		}
-		else {
-			opts = this.options;
-		}
-		this.options = opts;
-		
-		L.setOptions(this, this.options);
-		
+	initialize: function (latlng, options) {		
+		L.setOptions(this, options);		
 		this._latlng = L.latLng(latlng);
 		this._radius = this.options.radius;
 	},

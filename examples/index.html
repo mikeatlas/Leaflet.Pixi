@@ -4,27 +4,35 @@
 		<script src="http://cdn.leafletjs.com/leaflet-1.0.0-b1/leaflet-src.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/3.0.7/pixi.js"></script>
 		<script type="text/javascript" src='/leaflet-pixi-bundle.js'></script>
+
 	</head>
 
 	<body>
-		<div id="map" style='height: 500px;'></div>
+		<div id="map" style='height: 400px;'></div>
 	</body>
 
 
 		<script type='text/javascript'>
 			// Create the map
 			var porterSq = new L.LatLng(42.388349, -71.119355);
-			var map = L.map('map', {preferPixi: true}).setView(porterSq, 5);
+			var centrlSq = new L.LatLng(42.365586, -71.104124);
+
+			var map = L.map('map', {preferPixi: true}).setView(porterSq, 12);
 
 			//Set up the OSM base layer
  			var osmUrl = 'http://a.tile.openstreetmap.org/{z}/{x}/{y}.png';
 	        var osmAttrib = 'Map data © OpenStreetMap contributors';
 	        var osm = new L.TileLayer(osmUrl, { minZoom: 1, maxZoom: 17, 
-	        		attribution: osmAttrib, detectRetina: true });
+	        		attribution: osmAttrib });
 	        map.addLayer(osm);
-	        //var pixiLayer = L.TileLayer.pixiTileLayer().addTo(map);	
-			L.pixiCircleMarker(porterSq).addTo(map);
-			//L.PixiCircleMarker(porterSq);
+	        
+	        var x = L.marker(porterSq).addTo(map);
+	        x.setLatLng(centrlSq);
+
+			L.pixiCircleMarker(porterSq, 
+				{fillOpacity: 1, color: '#FF00FF', radius: 10})
+				.addTo(map);
+			
 
 		</script>
 
