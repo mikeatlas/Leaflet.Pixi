@@ -88,7 +88,7 @@ L.Pixi = L.Renderer.extend({
 	_container: null,
 	_renderer: null,
 	_graphics: new PIXI.Graphics(),
-
+	_paths: [],
 
 	onAdd: function () {
 		if (!this._container) {
@@ -137,7 +137,7 @@ L.Pixi = L.Renderer.extend({
 		    m = L.Browser.retina ? 2 : 1;
 
 		//set webgl renderer size (2x factor for retina)
-		this._renderer.resize(m * size.x, m * size.y)
+		this._renderer.resize(size.x, size.y)
 
 		// if (L.Browser.retina) {
 		// 	this._container.scale = new PIXI.Point(2, 2);
@@ -251,7 +251,8 @@ L.Pixi = L.Renderer.extend({
 		var p = this._map.latLngToLayerPoint(layer.getLatLng())
 		this._graphics.drawCircle(p.x, p.y, layer._radius);
 		this._graphics.endFill();		
-		this._container.addChild(this._graphics);
+		var pixiDisplayObject = this._container.addChild(this._graphics);
+		this._paths.push[pixiDisplayObject];
 		this._renderer.render(this._container);
 	},
 
