@@ -9,6 +9,8 @@ L.PixiCircleMarker = L.Path.extend({
 		fillOpacity: 1,
 		radius: 10,
 		renderer: new L.pixi(),
+		uuid: new String().genUUID(),
+		padding: 0.1,
 	},
 
 	initialize: function (latlng, options) {		
@@ -16,6 +18,15 @@ L.PixiCircleMarker = L.Path.extend({
 		this._latlng = L.latLng(latlng);
 		this._radius = this.options.radius;
 	},
+
+	getEvents: function () {
+		var events = {
+			zoom: this._renderer._updateTransformPixiCircleMarker
+		};
+
+		return events;
+	},
+
 
 	setLatLng: function (latlng) {
 		this._latlng = L.latLng(latlng);

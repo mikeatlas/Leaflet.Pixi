@@ -17,7 +17,7 @@
 			var porterSq = new L.LatLng(42.388349, -71.119355);
 			var centrlSq = new L.LatLng(42.365586, -71.104124);
 
-			var map = L.map('map', {preferPixi: true}).setView(porterSq, 12);
+			var map = L.map('map', {preferPixi: true}).setView(porterSq, 16);
 
 			//Set up the OSM base layer
  			var osmUrl = 'http://a.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -25,9 +25,14 @@
 	        var osm = new L.TileLayer(osmUrl, { minZoom: 1, maxZoom: 17, 
 	        		attribution: osmAttrib });
 	        map.addLayer(osm);
+
+	        map.on('click', function(mouseEvent){
+	        	console.log("layerPoint: " + mouseEvent.layerPoint);
+	        	console.log("containerPoint: " + mouseEvent.containerPoint);
+	        })
 	        
-	        var x = L.marker(porterSq).addTo(map);
-	        x.setLatLng(centrlSq);
+	        // var x = L.marker(porterSq).addTo(map);
+	        // x.setLatLng(centrlSq);
 
 			L.pixiCircleMarker(porterSq, 
 				{fillOpacity: 1, color: '#FF00FF', radius: 10})

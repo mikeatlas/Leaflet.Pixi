@@ -8,9 +8,14 @@ L.Pixi = L.Renderer.extend({
 	_rendererName: 'Leaflet.PixiJS.Renderer',
 	_rendererInfo: 'Pixi.JS Version: ' + PIXI.VERSION,
 	_container: null,
-	_renderer: null,
-	_graphics: new PIXI.Graphics(),
-	_paths: [],
+	_renderer: null,	
+	_paths: {},
+
+	options: {
+		// how much to extend the clip area around the map view (relative to its size)
+		// e.g. 0.1 would be 10% of map view in each direction; defaults to clip with the map view
+		padding: 0.1
+	},
 
 	onAdd: function () {
 		if (!this._container) {
@@ -18,35 +23,33 @@ L.Pixi = L.Renderer.extend({
 		}
 		
 		this._layers = this._layers || {};
-
-		// matlas todo: "old comment said: /// redraw vectors since canvas is cleared upon removal"
 		this._draw();		
 	},
 
 	_animateZoom: function() {},
 
 	_initContainer: function () {
-		var overlayDiv = this._map.getPanes().overlayPane;
-		
+		var mapContainer = this._map.getContainer();
 		this._container = new PIXI.Container();
 		this._ctx = this._container;
 		
-		var renderer = PIXI.autoDetectRenderer(
-			overlayDiv.offsetWidth, 
-			overlayDiv.offsetHeight, 
-			{transparent: true}
+		var renderer = new PIXI.WebGLRenderer(
+			mapContainer.offsetWidth, 
+			mapContainer.offsetHeight, 
+			{transparent: false}
 		);
 		this._renderer = renderer;
 
-		overlayDiv.appendChild(renderer.view);
+		this._map.getPanes().overlayPane.appendChild(renderer.view);
 		renderer.view.style.position = "absolute";
 		renderer.view.style.top = "0px";
+		renderer.view.style.opacity = 0.7;
 		renderer.render(this._container);
 	
 		L.Renderer.prototype._update.call(this);
 	},
 
-	_update: function () {
+	_update: function (event) {
 		if (this._map._animatingZoom && this._bounds) { 
 			return; 
 		}		
@@ -59,22 +62,51 @@ L.Pixi = L.Renderer.extend({
 		    m = L.Browser.retina ? 2 : 1;
 
 		//set webgl renderer size (2x factor for retina)
-		this._renderer.resize(size.x, size.y)
+		this._renderer.resize(size.x, size.y);
 
-		// if (L.Browser.retina) {
-		// 	this._container.scale = new PIXI.Point(2, 2);
-		// }
 
-		// translate so we use the same path coordinates after canvas element moves
-		console.log("fix ctx.translate!")
-		//this._ctx.translate(-b.min.x, -b.min.y);
+		this._renderer.render(this._container);
+		
 	},
 
 	_initPath: function (layer) {
 		this._layers[L.stamp(layer)] = layer;
 	},
 
-	_addPath: L.Util.falseFn,
+	_addPath: function (layer) {
+		var uuid = layer.options.uuid;
+		
+		if (!this._pathExists(layer)) {
+			var color = layer.options.color.toNumber();
+			var alpha = layer.options.fillOpacity;
+			var graphics = new PIXI.Graphics();
+			graphics.beginFill(color, alpha);
+			var p = this._map.latLngToLayerPoint(layer.getLatLng())
+			console.log("p: " + p);
+			graphics.drawCircle(p.x, p.y, layer._radius);
+			graphics.endFill();		
+			var pixiDisplayObject = this._container.addChild(graphics);
+			pixiDisplayObject.uuid = uuid;
+			pixiDisplayObject.latLng = layer.getLatLng();
+			pixiDisplayObject._map = this._map;
+			pixiDisplayObject.moveBackToLatLng = function() {
+				var p = this._map.latLngToLayerPoint(layer.getLatLng())
+				console.log("p': " + p);
+				this.x = p.x;
+				this.y = p.y;	
+			};
+			pixiDisplayObject.interactive = layer.options.interactive || true;
+			this._paths[uuid] = pixiDisplayObject;
+			this._renderer.render(this._container);
+		}
+	},
+
+	_zoomUpdate: function (layer) {
+		this._initPath();
+		var uuid = layer.options.uuid;
+		var pixiDisplayObject = this._paths[uuid];
+		debugger;
+	},
 
 	_removePath: function (layer) {
 		layer._removed = true;
@@ -87,7 +119,7 @@ L.Pixi = L.Renderer.extend({
 		layer._project();
 		layer._update();
 		this._draw();
-		this._redrawBounds = null;
+		this._redrawBounds = null;		
 	},
 
 	_updateStyle: function (layer) {
@@ -157,25 +189,43 @@ L.Pixi = L.Renderer.extend({
 	},
 
 	_updateTransform: function () {
-		var zoom = this._map.getZoom(),
-		    center = this._map.getCenter(),
-		    scale = this._map.getZoomScale(zoom, this._zoom),
-		    offset = this._map._latLngToNewLayerPoint(this._topLeft, zoom, center);
 
-		console.log('fix _updateTransform')
-		//	L.DomUtil.setTransform(this._container, offset, scale);
+	},
+
+	_updateTransformPixiCircleMarker: function(event) {
+		var p = this.options.padding;
+		var size = this._map.getSize();
+		var min = this._map.containerPointToLayerPoint(size.multiplyBy(-p)).round();
+		this._bounds = new L.Bounds(min, min.add(size.multiplyBy(1 + p * 2)).round());
+
+		if (this._map._animatingZoom && this._bounds) { return; }
+		var b = this._bounds;
+		//this._renderer._container.position = new PIXI.Point(b.min.x, b.min.y);
+		var q = this._map.latLngToLayerPoint(this._latlng);
+		//this._renderer._container.children[0].moveTo(q.x, q.y);
+		this._renderer._container.children[0].moveBackToLatLng();
+		this._renderer._renderer.render(this._renderer._container);
+	},
+
+	_pathExists: function (layer) {
+		var uuid = layer.options.uuid;
+		if (this._paths[uuid] === null || typeof this._paths[uuid] == 'undefined') {
+			return false;
+		}
+		return true;
 	},
 
 	_updateCircle: function (layer) {
-		var color = layer.options.color.toNumber();
-		var alpha = layer.options.fillOpacity;
-		this._graphics.beginFill(color, alpha);
-		var p = this._map.latLngToLayerPoint(layer.getLatLng())
-		this._graphics.drawCircle(p.x, p.y, layer._radius);
-		this._graphics.endFill();		
-		var pixiDisplayObject = this._container.addChild(this._graphics);
-		this._paths.push[pixiDisplayObject];
-		this._renderer.render(this._container);
+		var uuid = layer.options.uuid;
+		
+		if (this._pathExists(layer)) {
+			var pixiDisplayObject = this._paths[uuid];
+			var p = this._map.latLngToLayerPoint(layer.getLatLng());
+			var overlayDiv = this._map.getPanes().overlayPane;
+
+			//pixiDisplayObject.parent.moveTo(p.x, p.y);
+			this._paths[uuid] = pixiDisplayObject;			
+		}
 	},
 
 	_fillStroke: function (ctx, layer) {
